@@ -31,8 +31,6 @@ class ProductRecommendationService:
         self.bmi_compat_repo = bmi_compat_repo
 
     def get_recommendations(self, analysis_result_id: uuid.UUID) -> Dict[str, List[Dict[str, Any]]]:
-        SIMILARITY_THRESHOLD = 35.0
-
         analysis_result = self.user_analysis_repo.get_by_id(analysis_result_id)
         if not analysis_result:
             return {"hijab": [], "clothes": []}
@@ -65,30 +63,27 @@ class ProductRecommendationService:
         ranked_clothes = []
 
         for product in all_products:
-            total_score = 0
             product_dict = product.dict()
             product_available_colors = product_colors_map.get(product.id, [])
             
-            recommended_colors_for_product = []
+            product_color_distances = []
             if recommended_lab_colors and product_available_colors:
                 for p_color in product_available_colors:
                     try:
                         product_rgb = color_utils.hex_to_rgb(p_color.hex_color)
                         product_lab = color_utils.rgb_to_lab(product_rgb)
-                        
-                        for rec_lab in recommended_lab_colors:
-                            delta_e = color_utils.calculate_delta_e(product_lab, rec_lab)
-                            if delta_e < SIMILARITY_THRESHOLD:
-                                recommended_colors_for_product.append(p_color.hex_color)
-                                break
+                        min_distance = min(color_utils.calculate_delta_e(product_lab, rec_lab) for rec_lab in recommended_lab_colors)
+                        product_color_distances.append({"hex": p_color.hex_color, "distance": min_distance})
                     except (ValueError, IndexError):
                         continue
             
-            product_dict['color_recommendations'] = list(set(recommended_colors_for_product))
+            sorted_product_colors = sorted(product_color_distances, key=lambda c: c['distance'])
+            top_5_colors = [color['hex'] for color in sorted_product_colors[:5]]
+            product_dict['color_recommendations'] = top_5_colors
 
             if product.category.lower() == 'hijab':
                 total_score = face_scores.get((product.id, analysis_result.face_shape_id), 0)
-                if total_score > 0 and recommended_colors_for_product:
+                if total_score > 0 and top_5_colors:
                     product_dict['total_compatibility_score'] = total_score
                     ranked_hijabs.append(product_dict)
             

@@ -17,6 +17,7 @@ class ColorRecommendationService:
 
     def get_recommendations(self, analysis_result_id: uuid.UUID) -> Dict[str, List[str]]:
         analysis_result = self.user_analysis_repo.get_by_id(analysis_result_id)
+        
         if not analysis_result or not analysis_result.color_analysis_id:
             return {"color_recommendations": []}
 
