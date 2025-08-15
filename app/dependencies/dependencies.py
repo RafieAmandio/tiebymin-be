@@ -18,6 +18,7 @@ from repositories.user_analysis_result_repository import SupabaseUserAnalysisRes
 from repositories.user_photo_repository import SupabaseUserPhotoRepository
 from repositories.user_repository import SupabaseUserRepository
 from repositories.product_body_shape_compatibility_repository import SupabaseProductBodyShapeCompatibilityRepository
+from repositories.analysis_feedback_repository import SupabaseAnalysisFeedbackRepository
 
 def create_repository_provider(
     supabase_repo_class: Type,
@@ -88,4 +89,8 @@ get_user_repository = create_repository_provider(
 
 get_product_body_shape_compatibility_repository = create_repository_provider(
     supabase_repo_class=SupabaseProductBodyShapeCompatibilityRepository
+)
+
+get_analysis_feedback_repository = create_repository_provider(
+    supabase_repo_class=SupabaseAnalysisFeedbackRepository
 )

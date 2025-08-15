@@ -16,7 +16,8 @@ from api.v1.endpoints import (
     user_analysis_result,
     user_photo,
     product_body_shape_compatibility,
-    recomendation
+    recomendation,
+    analysis_feedback
 )
 
 app = FastAPI()
@@ -45,6 +46,7 @@ app.include_router(product_color_analysis_compatibility.router)
 app.include_router(product_bmi_compatibility.router)
 app.include_router(product_face_shape_compatibility.router)
 app.include_router(product_colors.router)
+app.include_router(analysis_feedback.router)
 
 @app.get("/", tags=["Root"])
 async def read_root():
