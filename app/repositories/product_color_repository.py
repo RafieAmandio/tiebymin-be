@@ -27,8 +27,17 @@ class ProductColorRepository(ABC):
     def delete(self, color_id: uuid.UUID) -> bool:
         pass
 
+    @abstractmethod
+    def get_all(self) -> List[ProductColor]:
+        pass
+
 class SupabaseProductColorRepository(ProductColorRepository):
     TABLE_NAME = "product_colors"
+    
+    def get_all(self) -> List[ProductColor]:
+        response = supabase.table(self.TABLE_NAME).select("*").execute()
+        return [ProductColor(**item) for item in response.data] if response.data else []
+
 
     def _prepare_data(self, pydantic_model: BaseModel) -> dict:
         data_dict = pydantic_model.dict()

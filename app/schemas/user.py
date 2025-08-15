@@ -9,6 +9,7 @@ class UserBase(BaseModel):
     email: EmailStr = Field(..., example="johndoe@example.com")
     first_name: str = Field(..., min_length=1, example="John")
     last_name: str = Field(..., min_length=1, example="Doe")
+    phone: Optional[float] = Field(None, example=1234567890)
     google_id: Optional[str] = Field(None, example="")
     is_active: bool = Field(True, example=True)
 
